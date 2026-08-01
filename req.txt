@@ -1,0 +1,16 @@
+We need to build an appication to scan QR code using mobile. No need of a moble app, we should use react libraries.
+Scanned QR data to be sent to a ESP32.
+Entities:
+    Clients - organisations subscribing for services
+    Users -  Belong to Clients. 
+    Settings - Belong to Clients. Can be edited only by its own Client Users
+
+User Workflows:
+1. Authentication
+    Users need access to login. Authorised Users Can scan QR code and relay to ESP32, adjust Settings.
+2. Users need to scan QR and send QR information to ESP32(Maybe an API call)
+    if QR has shelf code send to ESP32
+    else Get shelf code from 3rd Party application(Maybe an API call). AND send shelf code send to ESP32
+3. Settings page for field mapping and LED glow time
+    if 3rParty application shelf code is different from our shelf code, use mapping table.
+    
