@@ -42,8 +42,8 @@
 //  EDIT THESE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-#define WIFI_SSID            "Excitel_teddy2.4G"
-#define WIFI_PASSWORD        "1974677n"
+#define WIFI_SSID            "WiFI Name"
+#define WIFI_PASSWORD        "PASSWORD"
 
 // Static IP — must sit outside your router's DHCP pool
 #define STATIC_IP            "192.168.1.50"
