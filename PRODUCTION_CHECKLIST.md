@@ -9,8 +9,8 @@
 
 | Priority | Label | Count |
 |---|---|---|
-| P0 | Blocker — cannot ship | 6 |
-| P1 | High — must fix before production | 9 |
+| P0 | Blocker — cannot ship | 5 |
+| P1 | High — must fix before production | 10 |
 | P2 | Medium — fix soon after launch | 11 |
 | P3 | Low — polish / nice to have | 6 |
 | | **Total** | **32** |
@@ -49,21 +49,6 @@ The PWA has no login, no session, and no user identity. Anyone who knows the URL
 
 ---
 
-### [PWA] HTTPS ↔ HTTP mixed content: fundamental architecture deadlock
-
-Mobile browsers require HTTPS to expose `navigator.mediaDevices` (camera). But a browser serving HTTPS blocks all outbound HTTP fetches as mixed content. The ESP32 serves plain HTTP. This makes the canonical production setup — Vercel (HTTPS) + ESP32 (HTTP) — impossible in a browser.
-
-**File:** `src/App.jsx:89–96` (`sendToESP32`)
-
-**Fix:** Three viable paths:
-1. **Backend proxy** — PWA posts to an HTTPS backend that forwards to the ESP32 over HTTP on the LAN.
-2. **Serve PWA locally over HTTP** — requires a local server on-site; camera then works only on same-origin HTTP.
-3. **HTTPS on ESP32** — technically possible with self-signed certs but operationally complex.
-
-Option 1 (backend proxy) aligns with the auth and backend requirements anyway.
-
----
-
 ### [PWA] Hardcoded `DUMMY_BASE` fallback — all users silently share one device
 
 When the Device URL setting is empty, `sendToESP32` falls back to the literal string `http://192.168.1.50`. A worker who hasn't configured settings, or whose settings were cleared, will unknowingly send all scans to that hardcoded address — silently overriding another factory's shelf state.
@@ -85,6 +70,28 @@ Settings and all shelf code mappings live in IndexedDB on one browser on one pho
 ---
 
 ## P1 — High Priority
+
+### [PWA] HTTPS ↔ HTTP mixed content: will block production on some browsers
+
+The current dev setup (`npm run dev` over HTTP → ESP32 over HTTP) has no mixed content issue and works fine. However, once the PWA is deployed to Vercel (HTTPS), browsers enforce mixed content policy and block outbound HTTP fetches to the ESP32.
+
+Chrome on Android has inconsistent enforcement for private network addresses (`192.168.x.x`) — it may work today but can break silently when Chrome tightens its [Private Network Access](https://developer.chrome.com/blog/private-network-access-update) policy. Other browsers are stricter.
+
+| Deployment scenario | Status |
+|---|---|
+| `npm run dev` (HTTP) → ESP32 (HTTP) | ✅ Works — no issue |
+| Vercel (HTTPS) → ESP32 (HTTP) on Chrome Android | ⚠️ Works today, not guaranteed |
+| Vercel (HTTPS) → ESP32 (HTTP) on Firefox / Samsung Internet | ❌ Blocked |
+| Vercel (HTTPS) → ESP32 (HTTP) after Chrome tightens policy | ❌ Will break |
+
+**File:** `src/App.jsx:89–96` (`sendToESP32`)
+
+**Fix:** Three viable paths:
+1. **Backend proxy** — PWA posts to an HTTPS backend that forwards to the ESP32 over HTTP on the LAN. Aligns with the auth and backend requirements and is the recommended path.
+2. **Serve PWA locally over HTTP** — requires a local server on-site; camera then works only on same-origin HTTP.
+3. **HTTPS on ESP32** — technically possible with self-signed certs but operationally complex.
+
+---
 
 ### [BACKEND] No backend server — auth, devices, mappings, and audit are all missing
 
