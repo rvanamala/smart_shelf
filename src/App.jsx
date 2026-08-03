@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import SettingsPage from './SettingsPage';
+import SetupGuidePage from './SetupGuidePage';
 import { initDB, getSettings, saveSettings, lookupLocalCode } from './db';
 
 const DUMMY_BASE = 'http://192.168.1.50';
@@ -540,7 +541,16 @@ const App = () => {
   }, []);
 
   if (view === 'settings') {
-    return <SettingsPage onBack={() => setView('scanner')} />;
+    return (
+      <SettingsPage
+        onBack={() => setView('scanner')}
+        onOpenSetupGuide={() => setView('setup')}
+      />
+    );
+  }
+
+  if (view === 'setup') {
+    return <SetupGuidePage onBack={() => setView('settings')} />;
   }
 
   if (!cameraConstraints) {

@@ -86,7 +86,7 @@ const ConfirmDialog = ({ onConfirm, onCancel }) => (
 // ledGlowTime and useMappings are kept for db compatibility but not shown in UI
 const DEFAULT = { shelfUrl: '', ledGlowTime: 30, mappings: [] };
 
-const SettingsPage = ({ onBack }) => {
+const SettingsPage = ({ onBack, onOpenSetupGuide }) => {
   const [settings, setSettings] = useState(DEFAULT);
   const [savedSnapshot, setSavedSnapshot] = useState('');
   const [ready, setReady] = useState(false);
@@ -404,6 +404,26 @@ const SettingsPage = ({ onBack }) => {
         >
           {status === 'saving' ? 'Saving…' : isDirty ? 'Save Changes' : 'No Changes'}
         </button>
+
+        {/* Device setup guide */}
+        {onOpenSetupGuide && (
+          <div style={s.section}>
+            <p style={s.sectionLabel}>Device</p>
+            <button style={s.guideBtn} onClick={onOpenSetupGuide}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>How to set up a new device</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 'auto', flexShrink: 0, opacity: 0.5 }}>
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          </div>
+        )}
+
+        <div style={{ height: 'calc(var(--bottom-safe) + 8px)' }} />
       </div>
     </div>
   );
@@ -559,6 +579,13 @@ const s = {
   },
   savedMsg: { margin: 0, textAlign: 'center', fontSize: '14px', color: 'var(--success-text)', fontWeight: '500' },
   errorMsg: { margin: 0, textAlign: 'center', fontSize: '14px', color: 'var(--error-text)', fontWeight: '500' },
+  guideBtn: {
+    width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
+    background: 'var(--surface)', border: '1px solid var(--border)',
+    borderRadius: '12px', padding: '14px 16px', color: 'var(--primary)',
+    fontSize: '15px', fontWeight: '600', cursor: 'pointer',
+    WebkitTapHighlightColor: 'transparent', textAlign: 'left',
+  },
 };
 
 export default SettingsPage;
